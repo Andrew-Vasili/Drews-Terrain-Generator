@@ -2,16 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GeneticAlgo : MonoBehaviour {
-
-    void userControl()
-    {
-
-
-
-    }
-
-
-
+public class DNA{
 
 }

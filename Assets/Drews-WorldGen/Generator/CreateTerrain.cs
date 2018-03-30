@@ -17,20 +17,20 @@ public class CreateTerrain : MonoBehaviour
 
 
     //Generate a terrain method
-    public TerrainData generateTerrain(CreateTerrain createTerrain)
+    public TerrainData generateTerrain(TerrainSettings terrainsettings)
     {
 
         //Get variables from createterrain class and save to local instance
-        width = createTerrain.width;
-        height = createTerrain.height;
-        depth = createTerrain.depth;
-        scale = createTerrain.scale;
-        seed = createTerrain.seed;
-        octaves = createTerrain.octaves;
-        persistance = createTerrain.persistance;
-        lacunarity = createTerrain.lacunarity;
-        offsetX = createTerrain.offsetX;
-        offsetY = createTerrain.offsetY;
+        width = terrainsettings.Width;
+        height = terrainsettings.Height;
+        depth = terrainsettings.Depth;
+        scale = terrainsettings.Scale;
+        seed = terrainsettings.Seed;
+        octaves = terrainsettings.Octaves;
+        persistance = terrainsettings.Persistance;
+        lacunarity = terrainsettings.Lacunarity;
+        offsetX = terrainsettings.OffsetX;
+        offsetY = terrainsettings.OffsetY;
 
         //Variables for loading bar
         float completeValue = 30f;

@@ -28,7 +28,7 @@ public class RandomGeneration
         terrainSettings.setupTerrain(width, height, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY);
 
         //Create the terrain in world
-        GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(width, height, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY));
+        GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(terrainSettings));
 
     }
 

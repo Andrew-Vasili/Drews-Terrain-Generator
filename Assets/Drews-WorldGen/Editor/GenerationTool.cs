@@ -10,8 +10,8 @@ using UnityEditor;
 public class GenerationTool : EditorWindow
 {
 
+    //Setup window view
     [MenuItem("Window/Drews Terrain Generator")]
-
     public static void ShowWindow()
     {
         GetWindow<GenerationTool>("Drews Terrain Generator");
@@ -22,6 +22,7 @@ public class GenerationTool : EditorWindow
     {
 
         //Classes set
+        EvoGeneration evoGeneration = new EvoGeneration();
         RandomGeneration randomGeneration = new RandomGeneration();
 
         //Application name 
@@ -40,7 +41,9 @@ public class GenerationTool : EditorWindow
         //This button causes the generation of terrain through the use of evolutionary algorithms 
         if (GUILayout.Button("User Defined Generation"))
         {
+            evoGeneration.startGA();
             Debug.Log("Test Complete");
+
         }
 
         //This button shows the settings of the tool
