@@ -15,21 +15,22 @@ public class CreateTerrain : MonoBehaviour
     float offsetX;
     float offsetY;
 
+
     //Generate a terrain method
-    public TerrainData generateTerrain(int widthPre, int heightPre, int depthPre, float scalePre, int seedPre, int octavesPre, float persistancePre, float lacunarityPre, float offsetXPre, float offsetYPre)
+    public TerrainData generateTerrain(CreateTerrain createTerrain)
     {
 
-        //Setters
-        width = widthPre;
-        height = heightPre;
-        depth = depthPre;
-        scale = scalePre;
-        seed = seedPre;
-        octaves = octavesPre;
-        persistance = persistancePre;
-        lacunarity = lacunarityPre;
-        offsetX = offsetXPre;
-        offsetY = offsetYPre;
+        //Get variables from createterrain class and save to local instance
+        width = createTerrain.width;
+        height = createTerrain.height;
+        depth = createTerrain.depth;
+        scale = createTerrain.scale;
+        seed = createTerrain.seed;
+        octaves = createTerrain.octaves;
+        persistance = createTerrain.persistance;
+        lacunarity = createTerrain.lacunarity;
+        offsetX = createTerrain.offsetX;
+        offsetY = createTerrain.offsetY;
 
         //Variables for loading bar
         float completeValue = 30f;
@@ -95,23 +96,73 @@ public class CreateTerrain : MonoBehaviour
         //Set noise map array
         float[,] noiseMap = new float[width, height];
 
+        //Seed generator to get same terrains in future generations
+        System.Random seedGen = new System.Random(seed);
+        Vector2[] octaveOffsets = new Vector2[octaves];
+        for (int i = octaves; i < octaves; i++)
+        {
+            float x = seedGen.Next(-100000, 100000) + offsetX;
+            float y = seedGen.Next(-100000, 100000) + offsetY;
+            octaveOffsets[i] = new Vector2(x, y);
+        }
+
+        //Tracker for heightmap values
+        float maxNoise = float.MinValue;
+        float minNoise = float.MaxValue;
+
+        //Loop for each width pixel
         for (int x = 0; x < width; x++)
         {
+            //Loop for each height pixel
             for (int y = 0; y < height; y++)
             {
-                float noiseX = x / scale;
-                float noiseY = y / scale;
 
-                float perlinValue = Mathf.PerlinNoise(noiseX, noiseY);
-                noiseMap[x, y] = perlinValue;
+                float amplitude = 1;
+                float frequency = 1;
+                float noiseHeight = 0;
+
+                //Loop for each octave set
+                for (int z = 0; z < octaves; z++)
+                {
+                    float noiseX = x / scale * frequency + octaveOffsets[z].x;
+                    float noiseY = y / scale * frequency + octaveOffsets[z].y;
+
+                    float perlinValue = Mathf.PerlinNoise(noiseX, noiseY) * 2 - 1;
+                    noiseHeight += perlinValue * amplitude;
+                    frequency *= lacunarity;
+                }
+
+                //Checking values don't go over or under
+                if (noiseHeight > maxNoise)
+                {
+                    maxNoise = noiseHeight;
+                }
+                else if (noiseHeight < minNoise)
+                {
+                    minNoise = noiseHeight;
+                }
+
+                //Convert Values
+                noiseMap[x, y] = noiseHeight;
             }
         }
 
+        //Loop for each width pixel
+        for (int x = 0; x < width; x++)
+        {
+            //Loop for each height pixel
+            for (int y = 0; y < height; y++)
+            {
+                noiseMap[x, y] = Mathf.InverseLerp(minNoise, maxNoise, noiseMap[x, y]);
+            }
+        }
+
+        //Return noisemap
         return noiseMap;
     }
 
     // Get random value between X and Y
-    int randomValue(int min, int max)
+    private int randomValue(int min, int max)
     {
         int valueToReturn = Random.Range(min, max);
         return valueToReturn;

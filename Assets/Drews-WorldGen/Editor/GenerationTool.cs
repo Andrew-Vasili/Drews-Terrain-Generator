@@ -35,7 +35,6 @@ public class GenerationTool : EditorWindow
             randomGeneration.proceduralGenerate();
 
             Debug.Log("Drew's Test Complete");
-
         }
 
         //This button causes the generation of terrain through the use of evolutionary algorithms 
