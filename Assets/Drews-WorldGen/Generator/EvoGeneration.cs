@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -7,23 +6,19 @@ using UnityEditor;
 public class EvoGeneration : EditorWindow
 {
 
-    TerrainSettings terrainSettings = new TerrainSettings();
-    CreateTerrain createTerrain = new CreateTerrain();
-
-    public int Generation { get; private set; } //Current Generation
-
-    private List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
-
+    
     //Begin the process 
-    public void startGA()
+    public List<TerrainSettings> startIntialPopulation()
     {
         //Setup starting varaibles
-        Generation = 1;
+        List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
+        
 
         for (int x = 0; x < 10;)
         {
-            Debug.Log("Creating Values");
+            Debug.Log("Creating population : " + (x + 1));
 
+            TerrainSettings terrainSettings = new TerrainSettings();
             //Create random values 
             int width = 1000;
             int height = 1000;
@@ -36,47 +31,28 @@ public class EvoGeneration : EditorWindow
             float offsetX = randomFloat(0.00f, 500.00f);
             float offsetY = randomFloat(0.00f, 500.00f);
 
-            Debug.Log("Creating population : " + x);
-
             //Create terrain settings object
             terrainSettings.setupTerrain(width, height, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY);
 
             population.Add(terrainSettings);
-
             x++;
         }
-
-
-
-
+        return population;
     }
 
-    int test()
+
+    public List<TerrainSettings> newGeneration(List<TerrainSettings> parents)
     {
-        int x = 1;
-        return x;
-    }
+        List<TerrainSettings> newPopulation = new List<TerrainSettings>(); //Current Population
 
-    static void Init()
-    {
-        EvoGeneration window = ScriptableObject.CreateInstance<EvoGeneration>();
-        window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
-        window.ShowPopup();
-    }
-
-    void OnGUI()
-    {
-        EditorGUILayout.LabelField("This is an example of EditorWindow.ShowPopup", EditorStyles.wordWrappedLabel);
-        GUILayout.Space(70);
-        if (GUILayout.Button("Agree!"))
-        {
-            this.Close();
-        }
+        int amountOfParents = parents.Count;
 
 
+
+
+        return newPopulation;
 
     }
-
 
     // Get random int value between X and Y
     private int randomInt(int min, int max)
@@ -88,9 +64,7 @@ public class EvoGeneration : EditorWindow
     // Get random float value between X and Y
     private float randomFloat(float min, float max)
     {
-
         return Random.Range(min, max);
-
     }
 
 
