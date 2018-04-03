@@ -18,12 +18,13 @@ public class GenerationTool : EditorWindow
     public CreateTerrain createTerrain = new CreateTerrain();
 
     //Variables for menu
-    public string menuType = "menu";
+    public string menuType = "";
     public string evoType = "start";
     public int generation = 1; //Current Generation
     public List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
     public List<TerrainSettings> parents = new List<TerrainSettings>(); //Population to take on
     int terrainNumber;
+    int populationToCreate = 10;
 
     //Setup window view
     [MenuItem("Window/Drews Terrain Generator")]
@@ -77,9 +78,11 @@ public class GenerationTool : EditorWindow
 
                     EvoGeneration evoGeneration = new EvoGeneration();
 
-                    population = evoGeneration.startIntialPopulation();
+                    population = evoGeneration.createPopulation(populationToCreate);
 
                     terrainNumber = 1;
+
+                    generation = 1;
 
                     menuType = "Evo";
                 }
@@ -126,21 +129,42 @@ public class GenerationTool : EditorWindow
 
                 GUILayout.Label("Current Generation : " + generation, EditorStyles.centeredGreyMiniLabel);
 
-            
+                GUILayout.Label("Showing terrain " + terrainNumber + " / " + population.Count, EditorStyles.centeredGreyMiniLabel);
 
-                if (evoType == "start")
+                GUILayout.Label("Parent's selected " + parents.Count + "(Minimal of 2)", EditorStyles.centeredGreyMiniLabel);
+
+
+
                 {
                     if (population.Count < terrainNumber)
                     {
-                        evoType = "nextGen";
+                        generation = generation + 1;
+
                         DestroyImmediate(GameObject.Find("Terrain"));
+
+                        GUILayout.Label("Showing terrain " + terrainNumber + " / " + population.Count, EditorStyles.centeredGreyMiniLabel);
+                        if (parents.Count < 2)
+                        {
+                            Debug.LogError("At least 2 parents must be selected from the population, please run the tool again.");
+                            if (GameObject.Find("Terrain") != null)
+                            {
+                                DestroyImmediate(GameObject.Find("Terrain"));
+                            }
+
+                            menuType = "menu";
+                        }
+
+                        EvoGeneration evoGeneration = new EvoGeneration();
+
+                        population = evoGeneration.createPopulation(populationToCreate);
+
+                        terrainNumber = 1;
+
                     }
 
                     else
                     {
-                        GUILayout.Label("Showing terrain " + terrainNumber + " / " + population.Count, EditorStyles.centeredGreyMiniLabel);
 
-                        GUILayout.Label("Parent's selected " + parents.Count + "(Minimal of 2)", EditorStyles.centeredGreyMiniLabel);
 
                         if (GameObject.Find("Terrain") != null)
                         {
@@ -170,28 +194,7 @@ public class GenerationTool : EditorWindow
                     }
                 }
 
-                else if (evoType == "nextGen")
-                {
-                    if(parents.Count < 2)
-                    {
-                        Debug.LogError("At least 2 parents must be selected from the population, please run the tool again.");
-                        if (GameObject.Find("Terrain") != null)
-                        {
-                            DestroyImmediate(GameObject.Find("Terrain"));
-                        }
-                        menuType = "menu";
-                        evoType = "start";
-                    }
-                    else
-                    {
-
-                    }
-                }
-
-                else
-                {
-
-                }
+               
             }
             catch (Exception exception)
             {

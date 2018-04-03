@@ -6,15 +6,15 @@ using UnityEditor;
 public class EvoGeneration : EditorWindow
 {
 
-    
-    //Begin the process 
-    public List<TerrainSettings> startIntialPopulation()
+
+    //Begin the create a new population of indivduals  
+    public List<TerrainSettings> createPopulation(int populationToCreate)
     {
         //Setup starting varaibles
         List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
-        
 
-        for (int x = 0; x < 10;)
+
+        for (int x = 0; x < populationToCreate;)
         {
             Debug.Log("Creating population : " + (x + 1));
 
@@ -41,13 +41,157 @@ public class EvoGeneration : EditorWindow
     }
 
 
-    public List<TerrainSettings> newGeneration(List<TerrainSettings> parents)
+    public List<TerrainSettings> newGeneration(List<TerrainSettings> parents, int populationSize)
     {
-        List<TerrainSettings> newPopulation = new List<TerrainSettings>(); //Current Population
+        List<TerrainSettings> newPopulation = new List<TerrainSettings>(); //Population of next generation
 
         int amountOfParents = parents.Count;
 
+        //Get 75% to figure out how many children to create
+        int childrenToCreateFromParents = (populationSize * 3) / 4;
 
+        //Get remaining figure for random generation
+        int childrenToCreateFromRandom = populationSize - childrenToCreateFromParents;
+
+        //Crossover operator 
+        for (int x = 0; x < childrenToCreateFromParents;)
+        {
+
+            //Get parents via random allocation
+            int parent1 = randomInt(0, parents.Count - 1);
+            int parent2 = randomInt(0, parents.Count - 1);
+
+            //Prevent both parents being the same object
+            while (parent2 == parent1)
+            {
+                parent2 = randomInt(0, parents.Count - 1);
+            }
+
+            //Crossover chance of 85% if above then parent(A) fully taken to next generation without crossover using a multipoint crossover technique 
+            if (randomInt(1, 100) > 85)
+            {
+                newPopulation.Add(parents[parent1]);
+            }
+            else
+            {
+
+                TerrainSettings terrainSettings = new TerrainSettings();
+
+                //Width
+                if (randomInt(1, 2) == 1){
+                    terrainSettings.Width = parents[parent1].Width;
+                }
+                else
+                {
+                    terrainSettings.Width = parents[parent2].Width;
+                }
+
+                //Height
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Height = parents[parent1].Height;
+                }
+                else
+                {
+                    terrainSettings.Height = parents[parent2].Height;
+                }
+
+                //Depth
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Depth = parents[parent1].Depth;
+                }
+                else
+                {
+                    terrainSettings.Depth = parents[parent2].Depth;
+                }
+
+                //Scale
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Scale = parents[parent1].Scale;
+                }
+                else
+                {
+                    terrainSettings.Scale = parents[parent2].Scale;
+                }
+
+                //Seed
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Seed = parents[parent1].Seed;
+                }
+                else
+                {
+                    terrainSettings.Seed = parents[parent2].Seed;
+                }
+
+                //Octaves
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Octaves = parents[parent1].Octaves;
+                }
+                else
+                {
+                    terrainSettings.Octaves = parents[parent2].Octaves;
+                }
+
+                //Persistance
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Persistance = parents[parent1].Persistance;
+                }
+                else
+                {
+                    terrainSettings.Persistance = parents[parent2].Persistance;
+                }
+
+                //Lacunarity
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.Lacunarity = parents[parent1].Lacunarity;
+                }
+                else
+                {
+                    terrainSettings.Lacunarity = parents[parent2].Lacunarity;
+                }
+
+                //OffsetX
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.OffsetX = parents[parent1].OffsetX;
+                }
+                else
+                {
+                    terrainSettings.OffsetX = parents[parent2].OffsetX;
+                }
+
+                //OffsetY
+                if (randomInt(1, 2) == 1)
+                {
+                    terrainSettings.OffsetY = parents[parent1].OffsetY;
+                }
+                else
+                {
+                    terrainSettings.OffsetY = parents[parent2].OffsetY;
+                }
+           
+                //Add Child to next generation pool
+                newPopulation.Add(terrainSettings);
+        
+
+            }
+            x++;
+        }
+
+        //Fill in population with new individuals for diversity
+        if (newPopulation.Count < populationSize)
+        {
+            int x = 10 - newPopulation.Count;
+
+            List<TerrainSettings> newIndividuals = createPopulation(x); //New individuals to add to population
+
+        }
 
 
         return newPopulation;
