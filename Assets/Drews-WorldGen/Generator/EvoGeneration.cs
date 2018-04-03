@@ -16,7 +16,7 @@ public class EvoGeneration : EditorWindow
 
         for (int x = 0; x < populationToCreate;)
         {
-            Debug.Log("Creating population : " + (x + 1));
+            Debug.Log("Creating random indivudal #" + (x + 1));
 
             TerrainSettings terrainSettings = new TerrainSettings();
             //Create random values 

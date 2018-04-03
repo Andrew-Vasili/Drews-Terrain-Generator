@@ -161,6 +161,18 @@ public class CreateTerrain : MonoBehaviour
         return noiseMap;
     }
 
+    private void colorTerrain(TerrainData terrainData)
+    {
+
+        int textureIndex;
+        int startingHeight;
+
+        float[,,] splatmap = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers];
+
+
+
+
+    }
     // Get random value between X and Y
     private int randomValue(int min, int max)
     {

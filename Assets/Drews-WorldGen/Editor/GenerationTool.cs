@@ -156,7 +156,7 @@ public class GenerationTool : EditorWindow
 
                         EvoGeneration evoGeneration = new EvoGeneration();
 
-                        population = evoGeneration.createPopulation(populationToCreate);
+                        population = evoGeneration.newGeneration(parents, populationToCreate);
 
                         terrainNumber = 1;
 
@@ -194,7 +194,7 @@ public class GenerationTool : EditorWindow
                     }
                 }
 
-               
+
             }
             catch (Exception exception)
             {
@@ -202,12 +202,11 @@ public class GenerationTool : EditorWindow
                 throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
             }
         }
-        else
-        {
-            Debug.Log("Broke");
-        }
 
-        if (menuType != "menu")
+
+
+        else if (menuType != "menu")
+        {
             //This button causes the complete random generation of a terrain
             if (GUILayout.Button("Reset tool"))
             {
@@ -219,6 +218,10 @@ public class GenerationTool : EditorWindow
                 evoType = "start";
 
             }
+        }
+        else
+        {
+            Debug.Log("Broke");
+        }
     }
-
 }
