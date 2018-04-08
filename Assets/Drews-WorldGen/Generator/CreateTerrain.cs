@@ -15,6 +15,9 @@ public class CreateTerrain : MonoBehaviour
     float offsetX;
     float offsetY;
 
+    int Resolution = 129;
+    float Length = 50f;
+    float Height = 50f;
 
     //Generate a terrain method
     public TerrainData generateTerrain(TerrainSettings terrainsettings)
@@ -61,7 +64,16 @@ public class CreateTerrain : MonoBehaviour
         EditorUtility.DisplayProgressBar("Generating...", "Creating base settings for your terrain, please be patient!", progress / completeValue);
 
         //Set base settings
+        terrainData.alphamapResolution = Resolution;
+        terrainData.heightmapResolution = Resolution;
         terrainData = GenerateHeightMap(terrainData);
+
+        //Set Textures
+        terrainData =  textureTerrain(terrainData);
+
+        //Add grass to world
+       // terrainData = grassForTerrain(terrainData);
+
         progress = progress + 10;
         EditorUtility.DisplayProgressBar("Generating...", "Creating empty terrain model, please be patient!", progress / completeValue);
 
@@ -88,7 +100,6 @@ public class CreateTerrain : MonoBehaviour
 
         return terrainData;
     }
-
 
     //Create the noise map using perlin noise
     float[,] GenerateHeights()
@@ -161,22 +172,100 @@ public class CreateTerrain : MonoBehaviour
         return noiseMap;
     }
 
-    private void colorTerrain(TerrainData terrainData)
+
+    public float[,] MakeHeightmap()
+{
+    float[,] Heightmap = new float[Resolution, Resolution];
+
+    for (int x = 0; x < Resolution; x++)
+        for (int z = 0; z < Resolution; z++)
+        {
+            Heightmap[x, z] = GetNormalizedHeight((float)x, (float)z);
+        }
+
+    return Heightmap;
+}
+
+
+public float[,,] MakeSplatmap(TerrainData TerrainData)
+{
+    float[,,] Splatmap = new float[Resolution, Resolution, 2];
+
+    for (int x = 0; x < Resolution; x++)
+        for (int z = 0; z < Resolution; z++)
+        {
+            float NormalizedX = (float)x / ((float)Resolution - 1f);
+            float NormalizedZ = (float)z / ((float)Resolution - 1f);
+
+            float Steepness = TerrainData.GetSteepness(NormalizedX, NormalizedZ) / 90f;
+
+            Splatmap[z, x, 0] = 1f - Steepness;
+            Splatmap[z, x, 1] = Steepness;
+        }
+
+    return Splatmap;
+}
+
+
+public float GetNormalizedHeight(float x, float z)
+{
+    return Mathf.Clamp(Mathf.PerlinNoise(x * 0.05f, z * 0.05f), 0f, 0.4f) * 0.95f + Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 0.05f;
+}
+
+
+//Add Texture's to terraindata
+TerrainData textureTerrain(TerrainData terrainData)
     {
+        //Set textures
+        SplatPrototype Sand = new SplatPrototype();
+        SplatPrototype Rock = new SplatPrototype();
+        Sand.texture = (Texture2D)Resources.Load("Sand");
+        Sand.tileSize = new Vector2(4f, 4f);
+        Rock.texture = (Texture2D)Resources.Load("Rock");
+        Rock.tileSize = new Vector2(4f, 4f);
 
-        int textureIndex;
-        int startingHeight;
+        //Apply Textures
+        terrainData.splatPrototypes = new SplatPrototype[] { Sand, Rock };
+        terrainData.RefreshPrototypes();
+        terrainData.SetAlphamaps(0, 0, MakeSplatmap(terrainData));
 
-        float[,,] splatmap = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers];
-
-
-
-
+        return terrainData;
     }
-    // Get random value between X and Y
-    private int randomValue(int min, int max)
+
+    //Add Grass to terraindata
+    TerrainData grassForTerrain(TerrainData terrainData)
     {
-        int valueToReturn = Random.Range(min, max);
-        return valueToReturn;
+        int grassDensity = 5;
+        int patchDetail = 2;
+
+        terrainData.SetDetailResolution(grassDensity, patchDetail);
+
+        int[,] newMap = new int[grassDensity, grassDensity];
+
+        for (int i = 0; i < grassDensity; i++)
+        {
+            for (int j = 0; j < grassDensity; j++)
+            {
+                // Sample the height at this location (note GetHeight expects int coordinates corresponding to locations in the heightmap array)
+                float height = terrainData.GetHeight(i, j);
+                if (height < 10.0f)
+                {
+                    newMap[i, j] = 6;
+                }
+                else
+                {
+                    newMap[i, j] = 0;
+                }
+            }
+        }
+        terrainData.SetDetailLayer(0, 0, 0, newMap);
+
+        return terrainData;
     }
+// Get random value between X and Y
+private int randomValue(int min, int max)
+{
+    int valueToReturn = Random.Range(min, max);
+    return valueToReturn;
+}
 }

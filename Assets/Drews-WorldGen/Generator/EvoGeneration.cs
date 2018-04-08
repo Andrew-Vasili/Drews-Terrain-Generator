@@ -67,7 +67,7 @@ public class EvoGeneration : EditorWindow
                 parent2 = randomInt(0, parents.Count - 1);
             }
 
-            //Crossover chance of 85% if above then parent(A) fully taken to next generation without crossover using a multipoint crossover technique 
+            //Crossover chance of 85%, if above then parent(A) fully taken to next generation without crossover using a multipoint crossover technique 
             if (randomInt(1, 100) > 85)
             {
                 newPopulation.Add(parents[parent1]);
@@ -78,7 +78,8 @@ public class EvoGeneration : EditorWindow
                 TerrainSettings terrainSettings = new TerrainSettings();
 
                 //Width
-                if (randomInt(1, 2) == 1){
+                if (randomInt(1, 100) < 50)
+                {
                     terrainSettings.Width = parents[parent1].Width;
                 }
                 else
@@ -87,7 +88,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Height
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Height = parents[parent1].Height;
                 }
@@ -97,7 +98,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Depth
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Depth = parents[parent1].Depth;
                 }
@@ -107,7 +108,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Scale
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Scale = parents[parent1].Scale;
                 }
@@ -117,7 +118,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Seed
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Seed = parents[parent1].Seed;
                 }
@@ -127,7 +128,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Octaves
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Octaves = parents[parent1].Octaves;
                 }
@@ -137,7 +138,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Persistance
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Persistance = parents[parent1].Persistance;
                 }
@@ -147,7 +148,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //Lacunarity
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.Lacunarity = parents[parent1].Lacunarity;
                 }
@@ -157,7 +158,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //OffsetX
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.OffsetX = parents[parent1].OffsetX;
                 }
@@ -167,7 +168,7 @@ public class EvoGeneration : EditorWindow
                 }
 
                 //OffsetY
-                if (randomInt(1, 2) == 1)
+                if (randomInt(1, 100) < 50)
                 {
                     terrainSettings.OffsetY = parents[parent1].OffsetY;
                 }
@@ -187,10 +188,11 @@ public class EvoGeneration : EditorWindow
         //Fill in population with new individuals for diversity
         if (newPopulation.Count < populationSize)
         {
+            Debug.Log("Creatin extra pop");
             int x = 10 - newPopulation.Count;
 
             List<TerrainSettings> newIndividuals = createPopulation(x); //New individuals to add to population
-
+            newPopulation.AddRange(newIndividuals);
         }
 
 

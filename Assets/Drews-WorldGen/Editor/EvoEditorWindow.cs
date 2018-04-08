@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+/**
+* The following class is the editor window for 
+* 
+**/
 public class EvoEditorWindow : EditorWindow
 {
 
@@ -15,10 +19,6 @@ public class EvoEditorWindow : EditorWindow
     int terrainNumber;
     int populationToCreate = 10;
 
-    public void StartProcess()
-    {
-
-    }
 
     void ShowWindow()
     {
@@ -53,6 +53,21 @@ public class EvoEditorWindow : EditorWindow
 
         }
 
+        //This button causes the complete random generation of a terrain
+        if (GUILayout.Button("Optimal Solution"))
+        {
+            this.Close();
+        }
+
+        //This button causes the complete random generation of a terrain
+        if (GUILayout.Button("Cancel Generation"))
+        {
+                DestroyImmediate(GameObject.Find("Terrain"));
+                this.Close();
+            
+
+        }
+
         if (evoType == "start")
         {
 
@@ -82,6 +97,10 @@ public class EvoEditorWindow : EditorWindow
         {
             if (population.Count < terrainNumber)
             {
+
+
+                population.Clear();
+
                 generation = generation + 1;
 
                 DestroyImmediate(GameObject.Find("Terrain"));
@@ -102,6 +121,8 @@ public class EvoEditorWindow : EditorWindow
 
                 population = evoGeneration.newGeneration(parents, populationToCreate);
 
+                parents.Clear();
+
                 terrainNumber = 1;
 
             }
@@ -115,7 +136,7 @@ public class EvoEditorWindow : EditorWindow
                 else
                 {
                     CreateTerrain createTerrain = new CreateTerrain();
-                    GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(population[terrainNumber - 1]));
+                   GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(population[terrainNumber - 1]));
                 }
 
             }

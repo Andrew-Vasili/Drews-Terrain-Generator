@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 /**
- * This class controls the Unity tools editor window
+ * Master class for the entire tool
  **/
 
 [CustomEditor(typeof(GenerationTool))]
@@ -17,9 +17,24 @@ public class GenerationTool : EditorWindow
     public TerrainSettings terrainSettings = new TerrainSettings();
     public CreateTerrain createTerrain = new CreateTerrain();
 
-    //Variables for menu
-    public string menuType = "";
+    //Starting variables for menu
+    public string menuType = "menu";
     int populationToCreate = 10;
+    bool showSettings = false;
+    String customSettings = "disabled";
+    int worldSize = 100;
+
+    //Tool settings (default values in place
+    Vector2 worldSizeSettings = new Vector2(100, 100);
+    bool waterStatus = false;
+    int Depth;
+    float Scale;
+    int Seed;
+    int Octaves;
+    float Persistance;
+    float Lacunarity;
+    float OffsetX;
+    float OffsetY;
 
     //Setup window view
     [MenuItem("Window/Drews Terrain Generator")]
@@ -35,22 +50,29 @@ public class GenerationTool : EditorWindow
 
 
         //Application name 
-        GUILayout.Label("Drews Terrain Generator", EditorStyles.centeredGreyMiniLabel);
+        GUILayout.Label("Drews Terrain Generator", EditorStyles.boldLabel);
 
         //Main Menu
         //----------------------------//
         if (menuType == "menu")
         {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
-            GUILayout.Label("Main Menu", EditorStyles.centeredGreyMiniLabel);
+            //Set mapsize to generate
+            GUILayout.Label("World Size, Width and Height", EditorStyles.centeredGreyMiniLabel);
+            worldSize = EditorGUILayout.IntSlider(worldSize, 50, 2000);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
             //This button causes the complete random generation of a terrain
-            if (GUILayout.Button("Complete Random Generation"))
+            if (GUILayout.Button("Random Generation"))
             {
                 Debug.Log("Random generation started");
                 try
                 {
-                    randomGeneration.proceduralGenerate();
+                    randomGeneration.proceduralGenerate(worldSize);
                 }
                 catch (Exception exception)
                 {
@@ -59,7 +81,6 @@ public class GenerationTool : EditorWindow
                 }
             }
             //----------------------------//
-
 
 
             //This button causes the generation of terrain through the use of evolutionary algorithms 
@@ -79,13 +100,33 @@ public class GenerationTool : EditorWindow
 
             //This button shows the settings of the tool
             //----------------------------//
-            if (GUILayout.Button("Settings"))
-            {
-                Debug.Log("Settings menu selected");
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            showSettings = EditorGUILayout.BeginToggleGroup("Custom Settings Enabled : " + showSettings, showSettings);
 
-                menuType = "settings";
+            if (showSettings)
+            {
+
+                customSettings = "Enabled";
+                GUILayout.Label("Water enabled = " + waterStatus);
+                if(GUILayout.Button("Change Water Status"))
+                {
+                    if (waterStatus)
+                    {
+                        waterStatus = false;
+                    }
+                    else
+                    {
+                        waterStatus = true;
+                    }
+                    
+                }
+
+                worldSizeSettings = EditorGUILayout.Vector2Field("World Size (Width, Height)", worldSizeSettings);
+
 
             }
+            EditorGUILayout.EndToggleGroup();
             //----------------------------//
 
 
@@ -114,25 +155,10 @@ public class GenerationTool : EditorWindow
                 throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
             }
         }
-
-
-
-        else if (menuType != "menu")
-        {
-            //This button causes the complete random generation of a terrain
-            if (GUILayout.Button("Reset tool"))
-            {
-                if (GameObject.Find("Terrain") != null)
-                {
-                    DestroyImmediate(GameObject.Find("Terrain"));
-                }
-                menuType = "menu";
-
-            }
-        }
         else
         {
             Debug.Log("Broke");
         }
     }
+
 }
