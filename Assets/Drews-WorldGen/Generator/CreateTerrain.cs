@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using System.IO;
 
 public class CreateTerrain : MonoBehaviour
 {
@@ -212,16 +213,23 @@ public float GetNormalizedHeight(float x, float z)
     return Mathf.Clamp(Mathf.PerlinNoise(x * 0.05f, z * 0.05f), 0f, 0.4f) * 0.95f + Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 0.05f;
 }
 
-
+TerrainData randomTextures(TerrainData terrainData)
+    {
+        DirectoryInfo dir = new DirectoryInfo("Textures");
+        FileInfo[] info = dir.GetFiles("*.*");
+        foreach (FileInfo f in info)
+        { Debug.Log("f"); }
+        return terrainData;
+    }
 //Add Texture's to terraindata
 TerrainData textureTerrain(TerrainData terrainData)
     {
         //Set textures
         SplatPrototype Sand = new SplatPrototype();
         SplatPrototype Rock = new SplatPrototype();
-        Sand.texture = (Texture2D)Resources.Load("Sand");
+        Sand.texture = (Texture2D)Resources.Load("Textures/Forest");
         Sand.tileSize = new Vector2(4f, 4f);
-        Rock.texture = (Texture2D)Resources.Load("Rock");
+        Rock.texture = (Texture2D)Resources.Load("Textures/Rock");
         Rock.tileSize = new Vector2(4f, 4f);
 
         //Apply Textures

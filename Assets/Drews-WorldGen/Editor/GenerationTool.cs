@@ -20,21 +20,20 @@ public class GenerationTool : EditorWindow
     //Starting variables for menu
     public string menuType = "menu";
     int populationToCreate = 10;
-    bool showSettings = false;
-    String customSettings = "disabled";
+    bool customSettings = false;
     int worldSize = 100;
 
     //Tool settings (default values in place
     Vector2 worldSizeSettings = new Vector2(100, 100);
     bool waterStatus = false;
-    int Depth;
-    float Scale;
-    int Seed;
-    int Octaves;
-    float Persistance;
-    float Lacunarity;
-    float OffsetX;
-    float OffsetY;
+    int depth = 0;
+    float scale = 0;
+    int seed = 0;
+    int octaves = 0;
+    float persistance = 0;
+    float lacunarity = 0;
+    float offsetX = 0;
+    float offsetY = 0;
 
     //Setup window view
     [MenuItem("Window/Drews Terrain Generator")]
@@ -48,7 +47,6 @@ public class GenerationTool : EditorWindow
     void OnGUI()
     {
 
-
         //Application name 
         GUILayout.Label("Drews Terrain Generator", EditorStyles.boldLabel);
 
@@ -60,19 +58,26 @@ public class GenerationTool : EditorWindow
             EditorGUILayout.Space();
 
             //Set mapsize to generate
-            GUILayout.Label("World Size, Width and Height", EditorStyles.centeredGreyMiniLabel);
-            worldSize = EditorGUILayout.IntSlider(worldSize, 50, 2000);
+            GUILayout.Label("World Size, Width and Height");
+            worldSize = EditorGUILayout.IntSlider(worldSize, 50, 2000, GUILayout.Width(200));
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
             //This button causes the complete random generation of a terrain
-            if (GUILayout.Button("Random Generation"))
+            if (GUILayout.Button("Random Generation", GUILayout.Width(200)))
             {
                 Debug.Log("Random generation started");
                 try
                 {
-                    randomGeneration.proceduralGenerate(worldSize);
+                    if (customSettings == false)
+                    {
+                        randomGeneration.proceduralGeneration(worldSize);
+                    }
+                    else
+                    {
+                        randomGeneration.proceduralGenerationCustomSettings(worldSize, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY, waterStatus);
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -86,7 +91,7 @@ public class GenerationTool : EditorWindow
             //This button causes the generation of terrain through the use of evolutionary algorithms 
             //----------------------------//
 
-            if (GUILayout.Button("User Defined Generation"))
+            if (GUILayout.Button("User Defined Generation", GUILayout.Width(200)))
             {
                 EvoEditorWindow inst = ScriptableObject.CreateInstance<EvoEditorWindow>();
                 inst.Show();
@@ -94,36 +99,34 @@ public class GenerationTool : EditorWindow
             }
             //----------------------------//
 
-
-
-
-
             //This button shows the settings of the tool
             //----------------------------//
             EditorGUILayout.Space();
             EditorGUILayout.Space();
-            showSettings = EditorGUILayout.BeginToggleGroup("Custom Settings Enabled : " + showSettings, showSettings);
+            customSettings = EditorGUILayout.BeginToggleGroup("Custom Settings Enabler", customSettings);
 
-            if (showSettings)
+            if (customSettings)
             {
 
-                customSettings = "Enabled";
-                GUILayout.Label("Water enabled = " + waterStatus);
-                if(GUILayout.Button("Change Water Status"))
-                {
-                    if (waterStatus)
-                    {
-                        waterStatus = false;
-                    }
-                    else
-                    {
-                        waterStatus = true;
-                    }
-                    
-                }
+                waterStatus = EditorGUILayout.Toggle("Water Toggle", waterStatus, GUILayout.Width(200));
 
-                worldSizeSettings = EditorGUILayout.Vector2Field("World Size (Width, Height)", worldSizeSettings);
+                seed = EditorGUILayout.IntField("Seed", seed, GUILayout.Width(200));
 
+                octaves = EditorGUILayout.IntField("Octaves", octaves, GUILayout.Width(200));
+
+                seed = EditorGUILayout.IntField("Seed", seed, GUILayout.Width(200));
+
+                depth = EditorGUILayout.IntField("Depth", depth, GUILayout.Width(200));
+
+                scale = EditorGUILayout.FloatField("Scale", scale, GUILayout.Width(200));
+
+                persistance = EditorGUILayout.FloatField("Persistance", persistance, GUILayout.Width(200));
+
+                lacunarity = EditorGUILayout.FloatField("Lacunarity", lacunarity, GUILayout.Width(200));
+
+                offsetY = EditorGUILayout.FloatField("Offset Y", offsetY, GUILayout.Width(200));
+
+                offsetX = EditorGUILayout.FloatField("Offset X", offsetX, GUILayout.Width(200));
 
             }
             EditorGUILayout.EndToggleGroup();
@@ -133,32 +136,11 @@ public class GenerationTool : EditorWindow
 
         }
 
-        //Settings of application
-        else if (menuType == "settings")
-        {
-            GUILayout.Label("Settings", EditorStyles.centeredGreyMiniLabel);
-
-        }
-
-        else if (menuType == "Evo")
-        {
-
-            try
-            {
-              
-
-
-            }
-            catch (Exception exception)
-            {
-                menuType = "menu";
-                throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
-            }
-        }
         else
         {
             Debug.Log("Broke");
         }
-    }
 
+    }
 }
+
