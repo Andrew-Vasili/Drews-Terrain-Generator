@@ -15,10 +15,10 @@ public class RandomGeneration
         //Create random values 
         int width = mapSize;
         int height = mapSize;
-        int depth = randomInt(20, 100);
-        float scale = randomFloat(0.0001f, 50.00f);
+        int depth = randomInt(1, 50);
+        float scale = randomFloat(0.0001f, 30.00f);
         int seed = randomInt(1, 10000);
-        int octaves = randomInt(1, 5);
+        int octaves = randomInt(1, 10);
         float persistance = randomFloat(0.01f, 1.00f);
         float lacunarity = randomFloat(0.01f, 20.00f);
         float offsetX = randomFloat(0.00f, 500.00f);
@@ -38,12 +38,12 @@ public class RandomGeneration
 
 
     //Used to create a completly random terrain within the applications set height and width parameters
-    public void proceduralGenerationCustomSettings(int mapSize, int Depth, float Scale, int Seed, int Octaves, float Persistance, float Lacunarity, float OffsetX, float OffsetY, bool waterEnabled)
+    public void proceduralGenerationCustomSettings(int mapSize, int Depth, float Scale, int Seed, int Octaves, float Persistance, float Lacunarity, bool waterEnabled)
     {
         //Class for terrain settings object
         CreateTerrain createTerrain = new CreateTerrain();
 
-        Debug.Log(waterEnabled);
+        Debug.Log(Scale);
 
         //Set variables to create
         int width = mapSize;
@@ -54,8 +54,8 @@ public class RandomGeneration
         int octaves;
         float persistance;
         float lacunarity;
-        float offsetX;
-        float offsetY;
+        float offsetX = randomFloat(0.00f, 500.00f);
+        float offsetY = randomFloat(0.00f, 500.00f);
 
         //Values will be randomised if value passed from settings is equal to 0
         if (Depth == 0) { depth = randomInt(20, 100); }
@@ -75,12 +75,6 @@ public class RandomGeneration
 
         if (Lacunarity == 0) { lacunarity = randomFloat(0.01f, 20.00f); }
         else { lacunarity = Lacunarity; }
-
-        if (OffsetX == 0) { offsetX = randomFloat(0.00f, 500.00f); }
-        else { offsetX = OffsetX; }
-
-        if (OffsetY == 0) { offsetY = randomFloat(0.00f, 500.00f); }
-        else { offsetY = OffsetY; };
 
         //Create terrain settings object
         TerrainSettings terrainSettings = new TerrainSettings();
