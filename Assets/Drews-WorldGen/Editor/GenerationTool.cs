@@ -18,7 +18,8 @@ public class GenerationTool : EditorWindow
 
     //Starting variables for menu
     int populationToCreate = 10;
-    bool customSettings = false;
+    bool randomGenerationCustomSettings = false;
+    bool geneticGenerationCustomSettings = false;
     int worldSize = 100;
 
     //Tool settings (default values in place
@@ -92,7 +93,7 @@ public class GenerationTool : EditorWindow
             Debug.Log("Random generation started");
             try
             {
-                if (customSettings == false)
+                if (randomGenerationCustomSettings == false)
                 {
                     randomGeneration.proceduralGeneration(worldSize);
                 }
@@ -114,8 +115,20 @@ public class GenerationTool : EditorWindow
 
         if (GUILayout.Button("User Defined Generation", GUILayout.Width(200)))
         {
-            EvoEditorWindow inst = ScriptableObject.CreateInstance<EvoEditorWindow>();
-            inst.Show();
+            if (geneticGenerationCustomSettings == true)
+            {
+                EvoEditorWindow inst = ScriptableObject.CreateInstance<EvoEditorWindow>();
+                inst.worldSize = worldSize;
+                inst.populationToCreate = populationToCreate;
+                inst.Show();
+            }
+            else
+            {
+                EvoEditorWindow inst = ScriptableObject.CreateInstance<EvoEditorWindow>();
+                inst.worldSize = worldSize;
+                inst.populationToCreate = 10;
+                inst.Show();
+            }
 
         }
 
@@ -127,9 +140,9 @@ public class GenerationTool : EditorWindow
         //----------------------------//
         EditorGUILayout.Space();
         EditorGUILayout.Space();
-        customSettings = EditorGUILayout.BeginToggleGroup("Enable Custom Settings", customSettings);
+        randomGenerationCustomSettings = EditorGUILayout.BeginToggleGroup("Random Generation Settings", randomGenerationCustomSettings);
 
-        if (customSettings)
+        if (randomGenerationCustomSettings)
         {
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
             waterStatus = EditorGUILayout.Toggle("Water Toggle", waterStatus, GUILayout.Width(200));
@@ -230,10 +243,43 @@ public class GenerationTool : EditorWindow
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             //-------------------------------------------------------------------------------//
+
+       
+
             GUILayout.EndVertical();
+
         }
         EditorGUILayout.EndToggleGroup();
         //----------------------------//
+
+        EditorGUILayout.Space();
+        geneticGenerationCustomSettings = EditorGUILayout.BeginToggleGroup("Genetic Generation Settings", geneticGenerationCustomSettings);
+
+        if (geneticGenerationCustomSettings)
+        {
+            //Population Size Slider
+            //-------------------------------------------------------------------------------//
+            GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
+            GUILayout.BeginHorizontal();
+            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+            GUILayout.Label("Population per generation = " + populationToCreate);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            populationToCreate = Mathf.RoundToInt(GUILayout.HorizontalSlider(populationToCreate, 10, 50, GUILayout.Width(200)));
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.Width(200));
+            GUI.skin.label.alignment = TextAnchor.UpperLeft;
+            GUILayout.Label(10.ToString());
+            GUI.skin.label.alignment = TextAnchor.UpperRight;
+            GUILayout.Label(50.ToString());
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            //-------------------------------------------------------------------------------//
+        }
+        EditorGUILayout.EndToggleGroup();
     }
-}
+    }
 

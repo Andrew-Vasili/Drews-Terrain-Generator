@@ -1,100 +1,99 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * The following class is used for random generation of the terrain, it also allows for user defined settings to be passed to it for less random terrains
+ **/
 public class RandomGeneration
 {
+
+    //Class Wide Variables
+    bool waterEnabled;
+    TerrainSettings terrainSettings = new TerrainSettings();
 
     //Used to create a completly random terrain within the applications set height and width parameters
     public void proceduralGeneration(int mapSize)
     {
-        //Class for terrain settings object
-        CreateTerrain createTerrain = new CreateTerrain();
 
-        //Create random values 
-        int width = mapSize;
-        int height = mapSize;
-        int depth = randomInt(1, 50);
-        float scale = randomFloat(0.0001f, 30.00f);
-        int seed = randomInt(1, 10000);
-        int octaves = randomInt(1, 10);
-        float persistance = randomFloat(0.01f, 1.00f);
-        float lacunarity = randomFloat(0.01f, 20.00f);
-        float offsetX = randomFloat(0.00f, 500.00f);
-        float offsetY = randomFloat(0.00f, 500.00f);
+        //Set settings values 
+        terrainSettings.Width = mapSize;
+        terrainSettings.Height = mapSize;
+        terrainSettings.Depth = randomInt(1, 50);
+        terrainSettings.Scale = randomFloat(0.0001f, 30.00f);
+        terrainSettings.Seed = randomInt(1, 10000);
+        terrainSettings.Octaves = randomInt(1, 10);
+        terrainSettings.Persistance = randomFloat(0.01f, 1.00f);
+        terrainSettings.Lacunarity = randomFloat(0.01f, 20.00f);
+        terrainSettings.OffsetX = randomFloat(0.00f, 500.00f);
+        terrainSettings.OffsetY = randomFloat(0.00f, 500.00f);
+        waterEnabled = false;
 
-        //Create terrain settings object
-        TerrainSettings terrainSettings = new TerrainSettings();
-        terrainSettings.setupTerrain(width, height, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY);
-
-        //Create the terrain in world
-        GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(terrainSettings));
-
-        GameObject water = GameObject.Instantiate(Resources.Load("Water") as GameObject);
-        water.transform.localScale = new Vector3(height * 2, 1, width * 2);
-        water.transform.localPosition = new Vector3(0, 30, 0);
+        //Generate terrain
+        generateTerrain();
     }
 
 
     //Used to create a completly random terrain within the applications set height and width parameters
-    public void proceduralGenerationCustomSettings(int mapSize, int Depth, float Scale, int Seed, int Octaves, float Persistance, float Lacunarity, bool waterEnabled)
+    public void proceduralGenerationCustomSettings(int mapSize, int Depth, float Scale, int Seed, int Octaves, float Persistance, float Lacunarity, bool WaterEnabled)
     {
-        //Class for terrain settings object
-        CreateTerrain createTerrain = new CreateTerrain();
 
-        Debug.Log(Scale);
-
-        //Set variables to create
-        int width = mapSize;
-        int height = mapSize;
-        int depth;
-        float scale;
-        int seed;
-        int octaves;
-        float persistance;
-        float lacunarity;
-        float offsetX = randomFloat(0.00f, 500.00f);
-        float offsetY = randomFloat(0.00f, 500.00f);
+        //Set variables
+        terrainSettings.Width = mapSize;
+        terrainSettings.Height = mapSize;
+        terrainSettings.OffsetX = randomFloat(0.00f, 500.00f);
+        terrainSettings.OffsetY = randomFloat(0.00f, 500.00f);
+        waterEnabled = WaterEnabled;
 
         //Values will be randomised if value passed from settings is equal to 0
-        if (Depth == 0) { depth = randomInt(20, 100); }
-        else { depth = Depth; }
+        if (Depth == 0) { terrainSettings.Depth = randomInt(20, 100); }
+        else { terrainSettings.Depth = Depth; }
+        if (Scale == 0) { terrainSettings.Scale = randomFloat(0.0001f, 50.00f); }
+        else { terrainSettings.Scale = Scale; }
+        if (Seed == 0) { terrainSettings.Seed = randomInt(1, 10000); }
+        else { terrainSettings.Seed = Seed; }
+        if (Octaves == 0) { terrainSettings.Octaves = randomInt(1, 5); }
+        else { terrainSettings.Octaves = Octaves; }
+        if (Persistance == 0) { terrainSettings.Persistance = randomFloat(0.01f, 1.00f); }
+        else { terrainSettings.Persistance = Persistance; }
+        if (Lacunarity == 0) { terrainSettings.Lacunarity = randomFloat(0.01f, 20.00f); }
+        else { terrainSettings.Lacunarity = Lacunarity; }
 
-        if (Scale == 0) { scale = randomFloat(0.0001f, 50.00f); }
-        else { scale = Scale; }
+        //Generate terrain
+        generateTerrain();
+    }
 
-        if (Seed == 0) { seed = randomInt(1, 10000); }
-        else { seed = Seed; }
+    //Generate terrain and any settings set by it
+    private void generateTerrain()
+    {
 
-        if (Octaves == 0) { octaves = randomInt(1, 5); }
-        else { octaves = Octaves; }
-
-        if (Persistance == 0) { persistance = randomFloat(0.01f, 1.00f); }
-        else { persistance = Persistance; }
-
-        if (Lacunarity == 0) { lacunarity = randomFloat(0.01f, 20.00f); }
-        else { lacunarity = Lacunarity; }
-
-        //Create terrain settings object
-        TerrainSettings terrainSettings = new TerrainSettings();
-        terrainSettings.setupTerrain(width, height, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY);
+        //Class for terrain settings object
+        CreateTerrain createTerrain = new CreateTerrain();
 
         //Create the terrain in world
         GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(terrainSettings));
 
+        //Check if water has enabled, if so create it in scene
         if (waterEnabled == true)
         {
-            GameObject water = GameObject.Instantiate(Resources.Load("Water") as GameObject);
-            water.transform.localScale = new Vector3(height * 2, 1, width * 2);
-            water.transform.localPosition = new Vector3(0, 30, 0);
+            try
+            {
+                //Create a game object callled water from resources
+                GameObject water = GameObject.Instantiate(Resources.Load("Water") as GameObject);
+                water.transform.localScale = new Vector3(terrainSettings.Height * 2, 1, terrainSettings.Width * 2);
+                water.transform.localPosition = new Vector3(0, 30, 0);
+            }
+            catch (Exception exception)
+            {
+                Debug.Log("Water needs to be added as a game object within resource folder before being generated");
+                throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
+            }
         }
     }
-
 
     // Get random int value between X and Y
     private int randomInt(int min, int max)
     {
+    
         return UnityEngine.Random.Range(min, max);
 
     }

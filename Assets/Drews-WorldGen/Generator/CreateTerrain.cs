@@ -1,8 +1,9 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System.IO;
+using System;
 
-public class CreateTerrain : MonoBehaviour
+public class CreateTerrain
 {
     //Globals
     int width; // X Axis size
@@ -17,76 +18,80 @@ public class CreateTerrain : MonoBehaviour
     float offsetY;
 
     int Resolution = 129;
-    float Length = 50f;
-    float Height = 50f;
 
     //Generate a terrain method
     public TerrainData generateTerrain(TerrainSettings terrainsettings)
     {
-
-        //Get variables from createterrain class and save to local instance
-        width = terrainsettings.Width;
-        height = terrainsettings.Height;
-        depth = terrainsettings.Depth;
-        scale = terrainsettings.Scale;
-        seed = terrainsettings.Seed;
-        octaves = terrainsettings.Octaves;
-        persistance = terrainsettings.Persistance;
-        lacunarity = terrainsettings.Lacunarity;
-        offsetX = terrainsettings.OffsetX;
-        offsetY = terrainsettings.OffsetY;
-
-        //Variables for loading bar
-        float completeValue = 30f;
-        float progress = 0f;
-
-        EditorUtility.DisplayProgressBar("Generating...", "Generating terrain, please be patient!", progress / completeValue);
-
-        //Intialise terrain object settings
-        TerrainData terrainData = new TerrainData();
-
-        progress = progress + 10;
-        EditorUtility.DisplayProgressBar("Generating...", "Randomizing those values, please be patient!", progress / completeValue);
-
-        //50/50 chance of Offset having mathing values
-        int x = randomValue(1, 10);
-        if (x <= 5)
+        try
         {
-            offsetX = randomValue(1, 200);
-            offsetY = randomValue(1, 200);
+            //Get variables from createterrain class and save to local instance
+            width = terrainsettings.Width;
+            height = terrainsettings.Height;
+            depth = terrainsettings.Depth;
+            scale = terrainsettings.Scale;
+            seed = terrainsettings.Seed;
+            octaves = terrainsettings.Octaves;
+            persistance = terrainsettings.Persistance;
+            lacunarity = terrainsettings.Lacunarity;
+            offsetX = terrainsettings.OffsetX;
+            offsetY = terrainsettings.OffsetY;
+
+            //Variables for loading bar
+            float completeValue = 30f;
+            float progress = 0f;
+
+            EditorUtility.DisplayProgressBar("Generating...", "Generating terrain, please be patient!", progress / completeValue);
+
+            //Intialise terrain object settings
+            TerrainData terrainData = new TerrainData();
+
+            progress = progress + 10;
+            EditorUtility.DisplayProgressBar("Generating...", "Randomizing those values, please be patient!", progress / completeValue);
+
+            //50/50 chance of Offset having mathing values
+            int x = randomValue(1, 10);
+            if (x <= 5)
+            {
+                offsetX = randomValue(1, 200);
+                offsetY = randomValue(1, 200);
+            }
+            else
+            {
+                int y = randomValue(1, 200);
+                offsetX = y;
+                offsetY = y;
+            }
+            progress = progress + 10;
+            EditorUtility.DisplayProgressBar("Generating...", "Creating base settings for your terrain, please be patient!", progress / completeValue);
+
+            //Set base settings
+            terrainData.alphamapResolution = Resolution;
+            terrainData.heightmapResolution = randomEven(200, 500) + 1;
+            terrainData = GenerateHeightMap(terrainData);
+
+            //Set Textures
+            terrainData = textureTerrain(terrainData);
+
+            //Add grass to world
+            // terrainData = grassForTerrain(terrainData);
+
+            progress = progress + 10;
+            EditorUtility.DisplayProgressBar("Generating...", "Creating empty terrain model, please be patient!", progress / completeValue);
+
+            //Generate base terrain
+            progress = progress + 10;
+
+            EditorUtility.DisplayProgressBar("Generating...", "Adding finshing touches, please be patient!", progress / completeValue);
+
+            EditorUtility.ClearProgressBar();
+
+            return terrainData;
         }
-        else
+        catch(Exception exception)
         {
-            int y = randomValue(1, 200);
-            offsetX = y;
-            offsetY = y;
+            EditorUtility.ClearProgressBar();
+            throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
         }
-        progress = progress + 10;
-        EditorUtility.DisplayProgressBar("Generating...", "Creating base settings for your terrain, please be patient!", progress / completeValue);
-
-        //Set base settings
-        terrainData.alphamapResolution = Resolution;
-        terrainData.heightmapResolution = Resolution;
-        terrainData = GenerateHeightMap(terrainData);
-
-        //Set Textures
-        terrainData =  textureTerrain(terrainData);
-
-        //Add grass to world
-       // terrainData = grassForTerrain(terrainData);
-
-        progress = progress + 10;
-        EditorUtility.DisplayProgressBar("Generating...", "Creating empty terrain model, please be patient!", progress / completeValue);
-
-        //Generate base terrain
-        progress = progress + 10;
-
-        EditorUtility.DisplayProgressBar("Generating...", "Adding finshing touches, please be patient!", progress / completeValue);
-
-        EditorUtility.ClearProgressBar();
-
-        return terrainData;
-
     }
 
     //Create the heightmap using perlin noise
@@ -175,45 +180,45 @@ public class CreateTerrain : MonoBehaviour
 
 
     public float[,] MakeHeightmap()
-{
-    float[,] Heightmap = new float[Resolution, Resolution];
+    {
+        float[,] Heightmap = new float[Resolution, Resolution];
 
-    for (int x = 0; x < Resolution; x++)
-        for (int z = 0; z < Resolution; z++)
-        {
-            Heightmap[x, z] = GetNormalizedHeight((float)x, (float)z);
-        }
+        for (int x = 0; x < Resolution; x++)
+            for (int z = 0; z < Resolution; z++)
+            {
+                Heightmap[x, z] = GetNormalizedHeight((float)x, (float)z);
+            }
 
-    return Heightmap;
-}
-
-
-public float[,,] MakeSplatmap(TerrainData TerrainData)
-{
-    float[,,] Splatmap = new float[Resolution, Resolution, 2];
-
-    for (int x = 0; x < Resolution; x++)
-        for (int z = 0; z < Resolution; z++)
-        {
-            float NormalizedX = (float)x / ((float)Resolution - 1f);
-            float NormalizedZ = (float)z / ((float)Resolution - 1f);
-
-            float Steepness = TerrainData.GetSteepness(NormalizedX, NormalizedZ) / 90f;
-
-            Splatmap[z, x, 0] = 1f - Steepness;
-            Splatmap[z, x, 1] = Steepness;
-        }
-
-    return Splatmap;
-}
+        return Heightmap;
+    }
 
 
-public float GetNormalizedHeight(float x, float z)
-{
-    return Mathf.Clamp(Mathf.PerlinNoise(x * 0.05f, z * 0.05f), 0f, 0.4f) * 0.95f + Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 0.05f;
-}
+    public float[,,] MakeSplatmap(TerrainData TerrainData)
+    {
+        float[,,] Splatmap = new float[Resolution, Resolution, 2];
 
-TerrainData randomTextures(TerrainData terrainData)
+        for (int x = 0; x < Resolution; x++)
+            for (int z = 0; z < Resolution; z++)
+            {
+                float NormalizedX = (float)x / ((float)Resolution - 1f);
+                float NormalizedZ = (float)z / ((float)Resolution - 1f);
+
+                float Steepness = TerrainData.GetSteepness(NormalizedX, NormalizedZ) / 90f;
+
+                Splatmap[z, x, 0] = 1f - Steepness;
+                Splatmap[z, x, 1] = Steepness;
+            }
+
+        return Splatmap;
+    }
+
+
+    public float GetNormalizedHeight(float x, float z)
+    {
+        return Mathf.Clamp(Mathf.PerlinNoise(x * 0.05f, z * 0.05f), 0f, 0.4f) * 0.95f + Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 0.05f;
+    }
+
+    TerrainData randomTextures(TerrainData terrainData)
     {
         DirectoryInfo dir = new DirectoryInfo("Textures");
         FileInfo[] info = dir.GetFiles("*.*");
@@ -221,8 +226,8 @@ TerrainData randomTextures(TerrainData terrainData)
         { Debug.Log("f"); }
         return terrainData;
     }
-//Add Texture's to terraindata
-TerrainData textureTerrain(TerrainData terrainData)
+    //Add Texture's to terraindata
+    TerrainData textureTerrain(TerrainData terrainData)
     {
         //Set textures
         SplatPrototype Sand = new SplatPrototype();
@@ -270,10 +275,17 @@ TerrainData textureTerrain(TerrainData terrainData)
 
         return terrainData;
     }
-// Get random value between X and Y
-private int randomValue(int min, int max)
-{
-    int valueToReturn = Random.Range(min, max);
-    return valueToReturn;
-}
+    // Get random value between X and Y
+    private int randomValue(int min, int max)
+    {
+        int valueToReturn = UnityEngine.Random.Range(min, max);
+        return valueToReturn;
+    }
+
+    // Generate even number between X and Y 
+    private int randomEven(int min, int max)
+    {
+        int valueToReturn = 2 * UnityEngine.Random.Range(min, max);
+        return valueToReturn;
+    }
 }

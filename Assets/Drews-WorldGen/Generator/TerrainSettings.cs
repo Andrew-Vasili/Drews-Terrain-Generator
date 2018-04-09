@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿/**
+ * The following class holds the values for the terrains to be generated
+ **/
 public class TerrainSettings
 {
     public int Width { get; set; }
@@ -16,7 +15,7 @@ public class TerrainSettings
     public float OffsetY { get; set; }
 
     //Create a terrain object
-   public void setupTerrain(int width, int height, int depth, float scale, int seed, int octaves, float persistance, float lacunarity, float offsetX, float offsetY)
+    public void setupTerrain(int width, int height, int depth, float scale, int seed, int octaves, float persistance, float lacunarity, float offsetX, float offsetY)
     {
 
         Width = width;

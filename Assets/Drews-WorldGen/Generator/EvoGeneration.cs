@@ -2,55 +2,58 @@
 using UnityEngine;
 using UnityEditor;
 
-
+/**
+ * The following class is used for the random generation of the terrain through the use of genetic algorithms 
+ **/
 public class EvoGeneration : EditorWindow
 {
 
+    //Create a list object of a new population that contains new indivduals defined by terrain settings
+    public List<TerrainSettings> createPopulation(int populationToCreate, int mapSize)
 
-    //Begin the create a new population of indivduals  
-    public List<TerrainSettings> createPopulation(int populationToCreate)
     {
         //Setup starting varaibles
         List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
 
-
+        //Create a new indivdual and add it to the population for every indivdual needed as specified by the 'populationToCreate' variable
         for (int x = 0; x < populationToCreate;)
         {
-            Debug.Log("Creating random indivudal #" + (x + 1));
 
+            //Setup the terrain settings object
             TerrainSettings terrainSettings = new TerrainSettings();
-            //Create random values 
-            int width = 1000;
-            int height = 1000;
-            int depth = randomInt(20, 100);
-            float scale = randomFloat(0.0001f, 50.00f);
-            int seed = randomInt(1, 10000);
-            int octaves = randomInt(1, 5);
-            float persistance = randomFloat(0.01f, 1.00f);
-            float lacunarity = randomFloat(0.01f, 20.00f);
-            float offsetX = randomFloat(0.00f, 500.00f);
-            float offsetY = randomFloat(0.00f, 500.00f);
+
+            //Set settings values 
+            terrainSettings.Width = mapSize;
+            terrainSettings.Height = mapSize;
+            terrainSettings.Depth = randomInt(1, 50);
+            terrainSettings.Scale = randomFloat(0.0001f, 30.00f);
+            terrainSettings.Seed = randomInt(1, 10000);
+            terrainSettings.Octaves = randomInt(1, 10);
+            terrainSettings.Persistance = randomFloat(0.01f, 1.00f);
+            terrainSettings.Lacunarity = randomFloat(0.01f, 20.00f);
+            terrainSettings.OffsetX = randomFloat(0.00f, 500.00f);
+            terrainSettings.OffsetY = randomFloat(0.00f, 500.00f);
 
             //Create terrain settings object
-            terrainSettings.setupTerrain(width, height, depth, scale, seed, octaves, persistance, lacunarity, offsetX, offsetY);
-
             population.Add(terrainSettings);
             x++;
         }
         return population;
     }
 
-
-    public List<TerrainSettings> newGeneration(List<TerrainSettings> parents, int populationSize)
+    //Create a new generation through the use of several genetic operators and individuals selected from the last generation
+    public List<TerrainSettings> newGeneration(List<TerrainSettings> parents, int populationSize, int worldSize)
     {
-        List<TerrainSettings> newPopulation = new List<TerrainSettings>(); //Population of next generation
+        //Population object of new generation
+        List<TerrainSettings> newPopulation = new List<TerrainSettings>();
 
+        //Get amount of parents selected from the indiviudals of the last generation
         int amountOfParents = parents.Count;
 
-        //Get 75% to figure out how many children to create
+        //Get 75% of population to create value which in turn is used to figure out how many children need to be created and how many to be added for diversity
         int childrenToCreateFromParents = (populationSize * 3) / 4;
 
-        //Get remaining figure for random generation
+        //Get remaining figure for random generation (Diversity individuals)
         int childrenToCreateFromRandom = populationSize - childrenToCreateFromParents;
 
         //Crossover operator 
@@ -74,128 +77,169 @@ public class EvoGeneration : EditorWindow
             }
             else
             {
+                //Mutation rate set at 1%
 
+                //Create settings object to add to list
                 TerrainSettings terrainSettings = new TerrainSettings();
 
-                //Width
-                if (randomInt(1, 100) < 50)
-                {
-                    terrainSettings.Width = parents[parent1].Width;
-                }
-                else
-                {
-                    terrainSettings.Width = parents[parent2].Width;
-                }
-
-                //Height
-                if (randomInt(1, 100) < 50)
-                {
-                    terrainSettings.Height = parents[parent1].Height;
-                }
-                else
-                {
-                    terrainSettings.Height = parents[parent2].Height;
-                }
+                //Height and width size is defined for all terrains
+                terrainSettings.Width = worldSize;
+                terrainSettings.Height = worldSize;
 
                 //Depth
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Depth = parents[parent1].Depth;
+                    terrainSettings.Depth = randomInt(1, 50);
                 }
                 else
                 {
-                    terrainSettings.Depth = parents[parent2].Depth;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.Depth = parents[parent1].Depth;
+                    }
+                    else
+                    {
+                        terrainSettings.Depth = parents[parent2].Depth;
+                    }
                 }
 
                 //Scale
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Scale = parents[parent1].Scale;
+                    terrainSettings.Scale = randomFloat(0.0001f, 30.00f);
                 }
                 else
                 {
-                    terrainSettings.Scale = parents[parent2].Scale;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.Scale = parents[parent1].Scale;
+                    }
+                    else
+                    {
+                        terrainSettings.Scale = parents[parent2].Scale;
+                    }
                 }
 
                 //Seed
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Seed = parents[parent1].Seed;
+                    terrainSettings.Seed = randomInt(1, 10000);
                 }
                 else
                 {
-                    terrainSettings.Seed = parents[parent2].Seed;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.Seed = parents[parent1].Seed;
+                    }
+                    else
+                    {
+                        terrainSettings.Seed = parents[parent2].Seed;
+                    }
                 }
 
                 //Octaves
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Octaves = parents[parent1].Octaves;
+                    terrainSettings.Octaves = randomInt(1, 10);
                 }
                 else
                 {
-                    terrainSettings.Octaves = parents[parent2].Octaves;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.Octaves = parents[parent1].Octaves;
+                    }
+                    else
+                    {
+                        terrainSettings.Octaves = parents[parent2].Octaves;
+                    }
                 }
 
                 //Persistance
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Persistance = parents[parent1].Persistance;
+                    terrainSettings.Persistance = randomFloat(0.01f, 1.00f);
                 }
                 else
                 {
-                    terrainSettings.Persistance = parents[parent2].Persistance;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.Persistance = parents[parent1].Persistance;
+                    }
+                    else
+                    {
+                        terrainSettings.Persistance = parents[parent2].Persistance;
+                    }
                 }
 
                 //Lacunarity
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Lacunarity = parents[parent1].Lacunarity;
+                    terrainSettings.Lacunarity = randomFloat(0.01f, 20.00f);
                 }
                 else
                 {
-                    terrainSettings.Lacunarity = parents[parent2].Lacunarity;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.Lacunarity = parents[parent1].Lacunarity;
+                    }
+                    else
+                    {
+                        terrainSettings.Lacunarity = parents[parent2].Lacunarity;
+                    }
                 }
-
                 //OffsetX
-                if (randomInt(1, 100) < 50)
+
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.OffsetX = parents[parent1].OffsetX;
+                    terrainSettings.OffsetX = randomFloat(0.00f, 500.00f);
+
                 }
                 else
                 {
-                    terrainSettings.OffsetX = parents[parent2].OffsetX;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.OffsetX = parents[parent1].OffsetX;
+                    }
+                    else
+                    {
+                        terrainSettings.OffsetX = parents[parent2].OffsetX;
+                    }
                 }
 
                 //OffsetY
-                if (randomInt(1, 100) < 50)
+                if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.OffsetY = parents[parent1].OffsetY;
+                    terrainSettings.OffsetY = randomFloat(0.00f, 500.00f);
+
                 }
                 else
                 {
-                    terrainSettings.OffsetY = parents[parent2].OffsetY;
+                    if (randomInt(1, 100) < 50)
+                    {
+                        terrainSettings.OffsetY = parents[parent1].OffsetY;
+                    }
+                    else
+                    {
+                        terrainSettings.OffsetY = parents[parent2].OffsetY;
+                    }
                 }
-           
+
                 //Add Child to next generation pool
                 newPopulation.Add(terrainSettings);
-        
 
             }
             x++;
         }
 
-        //Fill in population with new individuals for diversity
-        if (newPopulation.Count < populationSize)
-        {
-            Debug.Log("Creatin extra pop");
-            int x = 10 - newPopulation.Count;
-
-            List<TerrainSettings> newIndividuals = createPopulation(x); //New individuals to add to population
-            newPopulation.AddRange(newIndividuals);
-        }
+        //Fills in population with new individuals for diversity 
 
 
+        //Creates new individuals and adds to population
+        List<TerrainSettings> newIndividuals = createPopulation(childrenToCreateFromRandom, worldSize);
+        newPopulation.AddRange(newIndividuals);
+
+ 
+        //Return new population
         return newPopulation;
 
     }

@@ -12,12 +12,13 @@ public class EvoEditorWindow : EditorWindow
 {
 
     //Variables 
-    public string evoType = "start";
-    public int generation = 1; //Current Generation
-    public List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
-    public List<TerrainSettings> parents = new List<TerrainSettings>(); //Population to take on
+    string evoType = "start";
+    int generation = 1; //Current Generation
+    List<TerrainSettings> population = new List<TerrainSettings>(); //Current Population
+    List<TerrainSettings> parents = new List<TerrainSettings>(); //Population to take on
     int terrainNumber;
-    int populationToCreate = 10;
+    public int populationToCreate;
+    public int worldSize;
 
 
     void ShowWindow()
@@ -77,7 +78,7 @@ public class EvoEditorWindow : EditorWindow
 
                 EvoGeneration evoGeneration = new EvoGeneration();
 
-                population = evoGeneration.createPopulation(populationToCreate);
+                population = evoGeneration.createPopulation(populationToCreate, worldSize);
 
                 terrainNumber = 1;
 
@@ -119,7 +120,7 @@ public class EvoEditorWindow : EditorWindow
 
                 EvoGeneration evoGeneration = new EvoGeneration();
 
-                population = evoGeneration.newGeneration(parents, populationToCreate);
+                population = evoGeneration.newGeneration(parents, populationToCreate, worldSize);
 
                 parents.Clear();
 
