@@ -43,13 +43,13 @@ public class GenerationTool : EditorWindow
 
     //Persistance Values
     float persistance = 0;
-    float persistanceMin = 0.00f;
-    float persistanceMax = 1.00f;
+    int persistanceMin = 0;
+    int persistanceMax = 1;
 
     //Lacunarity Values
     float lacunarity = 0;
-    float lacunarityMin = 0.00f;
-    float lacunarityMax = 20.00f;
+    int lacunarityMin = 0;
+    int lacunarityMax = 20;
 
 
     //Setup window view
@@ -230,7 +230,6 @@ public class GenerationTool : EditorWindow
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             //-------------------------------------------------------------------------------//
-
             GUILayout.EndVertical();
         }
         EditorGUILayout.EndToggleGroup();
