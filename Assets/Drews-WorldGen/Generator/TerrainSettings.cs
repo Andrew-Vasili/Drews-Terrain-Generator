@@ -1,4 +1,6 @@
-﻿/**
+﻿using UnityEngine;
+
+/**
  * The following class holds the values for the terrains to be generated
  **/
 public class TerrainSettings
@@ -13,6 +15,7 @@ public class TerrainSettings
     public float Lacunarity { get; set; }
     public float OffsetX { get; set; }
     public float OffsetY { get; set; }
+    public AnimationCurve heightCurve { get; set; }
 
     //Create a terrain object
     public void setupTerrain(int width, int height, int depth, float scale, int seed, int octaves, float persistance, float lacunarity, float offsetX, float offsetY)

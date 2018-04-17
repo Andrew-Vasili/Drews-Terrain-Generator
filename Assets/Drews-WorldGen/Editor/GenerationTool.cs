@@ -22,6 +22,8 @@ public class GenerationTool : EditorWindow
     bool geneticGenerationCustomSettings = false;
     int worldSize = 100;
 
+    AnimationCurve heightCurve = AnimationCurve.Linear(0, 0, 10, 10);
+
     //Tool settings (default values in place
     Vector2 worldSizeSettings = new Vector2(100, 100);
     bool waterStatus = false;
@@ -244,8 +246,18 @@ public class GenerationTool : EditorWindow
             GUILayout.EndVertical();
             //-------------------------------------------------------------------------------//
 
-       
-
+            //Height Curve
+            //-------------------------------------------------------------------------------//
+            GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
+            GUILayout.BeginHorizontal();
+            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+            GUILayout.Label("Height Curve");
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            heightCurve = EditorGUILayout.CurveField("Terrain Height Curve", heightCurve);
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            //-------------------------------------------------------------------------------//
             GUILayout.EndVertical();
 
         }

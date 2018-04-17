@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.IO;
 using System;
+using System.Collections.Generic;
 
 public class CreateTerrain
 {
@@ -87,7 +88,7 @@ public class CreateTerrain
 
             return terrainData;
         }
-        catch(Exception exception)
+        catch (Exception exception)
         {
             EditorUtility.ClearProgressBar();
             throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
@@ -110,113 +111,74 @@ public class CreateTerrain
     //Create the noise map using perlin noise
     float[,] GenerateHeights()
     {
-        //Set noise map array
         float[,] noiseMap = new float[width, height];
 
-        //Seed generator to get same terrains in future generations
-        System.Random seedGen = new System.Random(seed);
+        System.Random prng = new System.Random(seed);
         Vector2[] octaveOffsets = new Vector2[octaves];
-        for (int i = octaves; i < octaves; i++)
+        for (int i = 0; i < octaves; i++)
         {
-            float x = seedGen.Next(-100000, 100000) + offsetX;
-            float y = seedGen.Next(-100000, 100000) + offsetY;
-            octaveOffsets[i] = new Vector2(x, y);
+            octaveOffsets[i] = new Vector2(offsetX, offsetY);
         }
 
-        //Tracker for heightmap values
-        float maxNoise = float.MinValue;
-        float minNoise = float.MaxValue;
 
-        //Loop for each width pixel
-        for (int x = 0; x < width; x++)
+        if (scale <= 0)
         {
-            //Loop for each height pixel
-            for (int y = 0; y < height; y++)
+            scale = 0.0001f;
+        }
+
+        float maxNoiseHeight = float.MinValue;
+        float minNoiseHeight = float.MaxValue;
+
+
+        float halfWidth = width / 2f;
+        float halfHeight = height / 2f;
+
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
             {
 
                 float amplitude = 1;
                 float frequency = 1;
                 float noiseHeight = 0;
 
-                //Loop for each octave set
-                for (int z = 0; z < octaves; z++)
+                for (int i = 0; i < octaves; i++)
                 {
-                    float noiseX = x / scale * frequency + octaveOffsets[z].x;
-                    float noiseY = y / scale * frequency + octaveOffsets[z].y;
 
-                    float perlinValue = Mathf.PerlinNoise(noiseX, noiseY) * 2 - 1;
+                    float sampleX = (x - halfWidth) / scale * frequency + octaveOffsets[i].x;
+                    float sampleY = (y - halfHeight) / scale * frequency + octaveOffsets[i].y;
+
+                    float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     noiseHeight += perlinValue * amplitude;
+
+                    amplitude *= persistance;
                     frequency *= lacunarity;
+
                 }
 
-                //Checking values don't go over or under
-                if (noiseHeight > maxNoise)
+                if (noiseHeight > maxNoiseHeight)
                 {
-                    maxNoise = noiseHeight;
+                    maxNoiseHeight = noiseHeight;
                 }
-                else if (noiseHeight < minNoise)
+                else if (noiseHeight < minNoiseHeight)
                 {
-                    minNoise = noiseHeight;
+                    minNoiseHeight = noiseHeight;
                 }
 
-                //Convert Values
                 noiseMap[x, y] = noiseHeight;
             }
         }
-
-        //Loop for each width pixel
-        for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++)
         {
-            //Loop for each height pixel
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
-                noiseMap[x, y] = Mathf.InverseLerp(minNoise, maxNoise, noiseMap[x, y]);
+                noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
             }
         }
-
-        //Return noisemap
         return noiseMap;
     }
 
-
-    public float[,] MakeHeightmap()
-    {
-        float[,] Heightmap = new float[Resolution, Resolution];
-
-        for (int x = 0; x < Resolution; x++)
-            for (int z = 0; z < Resolution; z++)
-            {
-                Heightmap[x, z] = GetNormalizedHeight((float)x, (float)z);
-            }
-
-        return Heightmap;
-    }
-
-
-    public float[,,] MakeSplatmap(TerrainData TerrainData)
-    {
-        float[,,] Splatmap = new float[Resolution, Resolution, 2];
-
-        for (int x = 0; x < Resolution; x++)
-            for (int z = 0; z < Resolution; z++)
-            {
-                float NormalizedX = (float)x / ((float)Resolution - 1f);
-                float NormalizedZ = (float)z / ((float)Resolution - 1f);
-
-                float Steepness = TerrainData.GetSteepness(NormalizedX, NormalizedZ) / 90f;
-
-                Splatmap[z, x, 0] = 1f - Steepness;
-                Splatmap[z, x, 1] = Steepness;
-            }
-
-        return Splatmap;
-    }
-
-
-    public float GetNormalizedHeight(float x, float z)
-    {
-        return Mathf.Clamp(Mathf.PerlinNoise(x * 0.05f, z * 0.05f), 0f, 0.4f) * 0.95f + Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 0.05f;
-    }
 
     TerrainData randomTextures(TerrainData terrainData)
     {
@@ -245,6 +207,24 @@ public class CreateTerrain
         return terrainData;
     }
 
+    public float[,,] MakeSplatmap(TerrainData TerrainData)
+    {
+        float[,,] Splatmap = new float[Resolution, Resolution, 2];
+
+        for (int x = 0; x < Resolution; x++)
+            for (int z = 0; z < Resolution; z++)
+            {
+                float NormalizedX = (float)x / ((float)Resolution - 1f);
+                float NormalizedZ = (float)z / ((float)Resolution - 1f);
+
+                float Steepness = TerrainData.GetSteepness(NormalizedX, NormalizedZ) / 90f;
+
+                Splatmap[z, x, 0] = 1f - Steepness;
+                Splatmap[z, x, 1] = Steepness;
+            }
+
+        return Splatmap;
+    }
     //Add Grass to terraindata
     TerrainData grassForTerrain(TerrainData terrainData)
     {
