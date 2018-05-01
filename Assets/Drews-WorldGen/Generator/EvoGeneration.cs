@@ -27,7 +27,7 @@ public class EvoGeneration : EditorWindow
             terrainSettings.Height = mapSize;
             terrainSettings.Depth = randomInt(1, 50);
             terrainSettings.Scale = randomFloat(0.0001f, 30.00f);
-            terrainSettings.Seed = randomInt(1, 10000);
+            terrainSettings.WorldSeed = randomInt(1, 10000);
             terrainSettings.Octaves = randomInt(1, 10);
             terrainSettings.Persistance = randomFloat(0.01f, 1.00f);
             terrainSettings.Lacunarity = randomFloat(0.01f, 20.00f);
@@ -120,20 +120,20 @@ public class EvoGeneration : EditorWindow
                     }
                 }
 
-                //Seed
+                //worldSeed
                 if (randomInt(1, 100) == 100)
                 {
-                    terrainSettings.Seed = randomInt(1, 10000);
+                    terrainSettings.WorldSeed = randomInt(1, 10000);
                 }
                 else
                 {
                     if (randomInt(1, 100) < 50)
                     {
-                        terrainSettings.Seed = parents[parent1].Seed;
+                        terrainSettings.WorldSeed = parents[parent1].WorldSeed;
                     }
                     else
                     {
-                        terrainSettings.Seed = parents[parent2].Seed;
+                        terrainSettings.WorldSeed = parents[parent2].WorldSeed;
                     }
                 }
 

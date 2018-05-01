@@ -20,7 +20,7 @@ public class RandomGeneration
         terrainSettings.Height = mapSize;
         terrainSettings.Depth = randomInt(1, 50);
         terrainSettings.Scale = randomFloat(0.0001f, 30.00f);
-        terrainSettings.Seed = randomInt(1, 10000);
+        terrainSettings.WorldSeed = randomInt(1, 10000);
         terrainSettings.Octaves = randomInt(1, 10);
         terrainSettings.Persistance = randomFloat(0.01f, 1.00f);
         terrainSettings.Lacunarity = randomFloat(0.01f, 20.00f);
@@ -34,7 +34,7 @@ public class RandomGeneration
 
 
     //Used to create a completly random terrain within the applications set height and width parameters
-    public void proceduralGenerationCustomSettings(int mapSize, int Depth, float Scale, int Seed, int Octaves, float Persistance, float Lacunarity, bool WaterEnabled)
+    public void proceduralGenerationCustomSettings(int mapSize, int Depth, float Scale, int worldSeed, int Octaves, float Persistance, float Lacunarity, bool WaterEnabled)
     {
 
         //Set variables
@@ -49,8 +49,8 @@ public class RandomGeneration
         else { terrainSettings.Depth = Depth; }
         if (Scale == 0) { terrainSettings.Scale = randomFloat(0.0001f, 50.00f); }
         else { terrainSettings.Scale = Scale; }
-        if (Seed == 0) { terrainSettings.Seed = randomInt(1, 10000); }
-        else { terrainSettings.Seed = Seed; }
+        if (worldSeed == 0) { terrainSettings.WorldSeed = randomInt(1, 10000); }
+        else { terrainSettings.WorldSeed = worldSeed; }
         if (Octaves == 0) { terrainSettings.Octaves = randomInt(1, 5); }
         else { terrainSettings.Octaves = Octaves; }
         if (Persistance == 0) { terrainSettings.Persistance = randomFloat(0.01f, 1.00f); }
@@ -71,6 +71,7 @@ public class RandomGeneration
 
         //Create the terrain in world
         GameObject generatedTerrain = Terrain.CreateTerrainGameObject(createTerrain.generateTerrain(terrainSettings));
+
 
         //Check if water has enabled, if so create it in scene
         if (waterEnabled == true)

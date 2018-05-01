@@ -11,7 +11,7 @@ public class CreateTerrain
     int height; // Z Axis size
     int depth; // Y Axis size
     float scale;
-    int seed; //World ID
+    int worldSeed; //World ID
     int octaves; //Levels of noise in perlin noise heightmap
     float persistance; //Controls how much an octave effects the final heightmap 
     float lacunarity; //Controls details of octaves in the heightmap
@@ -25,12 +25,12 @@ public class CreateTerrain
     {
         try
         {
-            //Get variables from createterrain class and save to local instance
+            //Get variables from terrainsettings class and save to local instance
             width = terrainsettings.Width;
             height = terrainsettings.Height;
             depth = terrainsettings.Depth;
             scale = terrainsettings.Scale;
-            seed = terrainsettings.Seed;
+            worldSeed = terrainsettings.WorldSeed;
             octaves = terrainsettings.Octaves;
             persistance = terrainsettings.Persistance;
             lacunarity = terrainsettings.Lacunarity;
@@ -113,7 +113,7 @@ public class CreateTerrain
     {
         float[,] noiseMap = new float[width, height];
 
-        System.Random prng = new System.Random(seed);
+        System.Random prng = new System.Random(worldSeed);
         Vector2[] octaveOffsets = new Vector2[octaves];
         for (int i = 0; i < octaves; i++)
         {
@@ -129,7 +129,6 @@ public class CreateTerrain
         float maxNoiseHeight = float.MinValue;
         float minNoiseHeight = float.MaxValue;
 
-
         float halfWidth = width / 2f;
         float halfHeight = height / 2f;
 
@@ -142,6 +141,8 @@ public class CreateTerrain
                 float amplitude = 1;
                 float frequency = 1;
                 float noiseHeight = 0;
+
+       
 
                 for (int i = 0; i < octaves; i++)
                 {
@@ -156,7 +157,7 @@ public class CreateTerrain
                     frequency *= lacunarity;
 
                 }
-
+                
                 if (noiseHeight > maxNoiseHeight)
                 {
                     maxNoiseHeight = noiseHeight;
@@ -188,6 +189,7 @@ public class CreateTerrain
         { Debug.Log("f"); }
         return terrainData;
     }
+
     //Add Texture's to terraindata
     TerrainData textureTerrain(TerrainData terrainData)
     {
@@ -255,6 +257,18 @@ public class CreateTerrain
 
         return terrainData;
     }
+
+    public void generateTrees()
+    {
+
+        Terrain t = Terrain.activeTerrain;
+        TerrainData td = t.terrainData;
+
+        TreePrototype[] treeprototypes = new TreePrototype[]{ new TreePrototype() { prefab = (GameObject)Resources.Load("BigTree") }, new TreePrototype() { prefab = (GameObject)Resources.Load("Tree") } };
+        td.treePrototypes = treeprototypes;
+
+    }
+
     // Get random value between X and Y
     private int randomValue(int min, int max)
     {

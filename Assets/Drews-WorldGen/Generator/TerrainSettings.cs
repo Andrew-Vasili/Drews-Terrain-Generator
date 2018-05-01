@@ -9,7 +9,7 @@ public class TerrainSettings
     public int Height { get; set; }
     public int Depth { get; set; }
     public float Scale { get; set; }
-    public int Seed { get; set; }
+    public int WorldSeed { get; set; }
     public int Octaves { get; set; }
     public float Persistance { get; set; }
     public float Lacunarity { get; set; }
@@ -18,14 +18,14 @@ public class TerrainSettings
     public AnimationCurve heightCurve { get; set; }
 
     //Create a terrain object
-    public void setupTerrain(int width, int height, int depth, float scale, int seed, int octaves, float persistance, float lacunarity, float offsetX, float offsetY)
+    public void setupTerrain(int width, int height, int depth, float scale, int worldSeed, int octaves, float persistance, float lacunarity, float offsetX, float offsetY)
     {
 
         Width = width;
         Height = height;
         Depth = depth;
         Scale = scale;
-        Seed = seed;
+        WorldSeed = worldSeed;
         Octaves = octaves;
         Persistance = persistance;
         Lacunarity = lacunarity;

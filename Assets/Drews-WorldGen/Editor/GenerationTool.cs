@@ -27,7 +27,7 @@ public class GenerationTool : EditorWindow
     //Tool settings (default values in place
     Vector2 worldSizeSettings = new Vector2(100, 100);
     bool waterStatus = false;
-    int seed = 0;
+    int worldSeed = 0;
 
     //Depth Values
     int depth = 0;
@@ -101,7 +101,7 @@ public class GenerationTool : EditorWindow
                 }
                 else
                 {
-                    randomGeneration.proceduralGenerationCustomSettings(worldSize, depth, scale, seed, octaves, persistance, lacunarity, waterStatus);
+                    randomGeneration.proceduralGenerationCustomSettings(worldSize, depth, scale, worldSeed, octaves, persistance, lacunarity, waterStatus);
                 }
             }
             catch (Exception exception)
@@ -149,7 +149,7 @@ public class GenerationTool : EditorWindow
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
             waterStatus = EditorGUILayout.Toggle("Water Toggle", waterStatus, GUILayout.Width(200));
 
-            seed = EditorGUILayout.IntField("World Seed", seed, GUILayout.Width(200));
+            worldSeed = EditorGUILayout.IntField("World worldSeed", worldSeed, GUILayout.Width(200));
 
             //Octaves Slider
             //-------------------------------------------------------------------------------//
