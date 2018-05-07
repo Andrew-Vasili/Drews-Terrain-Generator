@@ -21,8 +21,8 @@ public class GenerationTool : EditorWindow
     bool randomGenerationCustomSettings = false;
     bool geneticGenerationCustomSettings = false;
     int worldSize = 100;
+    GameObject objectToPlace;
 
-    AnimationCurve heightCurve = AnimationCurve.Linear(0, 0, 10, 10);
 
     //Tool settings (default values in place
     Vector2 worldSizeSettings = new Vector2(100, 100);
@@ -133,6 +133,54 @@ public class GenerationTool : EditorWindow
             }
 
         }
+        if (GameObject.Find("Terrain") != null)
+        {
+
+            objectToPlace = EditorGUILayout.ObjectField("ObjectToPlace", objectToPlace, typeof(GameObject)) as GameObject;
+
+            //This button causes the complete random generation of a terrain
+            if (GUILayout.Button("Spawn Object", GUILayout.Width(200)))
+            {
+                Debug.Log("Object Spawning Started");
+                try
+                {
+                    Terrain terrain = Terrain.activeTerrain;
+                    int numberOfObjectsToPlace = 100; // Number of objects to place
+                    GameObject objectToPlace = Resources.Load("Trees/" + "Tree1") as GameObject; // Object to place
+                    int terrainWidth; // terrain size (x)
+                    int terrainLength; // terrain size (z)
+                    int terrainPosX; // terrain position x
+                    int terrainPosZ; // terrain position z
+
+                    // terrain width
+                    terrainWidth = (int)terrain.terrainData.size.x;
+                    // terrain length
+                    terrainLength = (int)terrain.terrainData.size.z;
+
+                    // terrain positions
+                    terrainPosX = (int)terrain.transform.position.x;
+                    terrainPosZ = (int)terrain.transform.position.z;
+
+                    // generate objects
+                    for (int x = 0; x <= numberOfObjectsToPlace; x++)
+                    {
+                        // generate random position for placement then get height of positon
+                        int positionX = UnityEngine.Random.Range(terrainPosX, terrainPosX + terrainWidth);
+                        int positionZ = UnityEngine.Random.Range(terrainPosZ, terrainPosZ + terrainLength);
+                        float positionY = Terrain.activeTerrain.SampleHeight(new Vector3(positionX, 0, positionZ));
+
+                        // create new gameObject on random position
+                        GameObject worldObject = Instantiate(objectToPlace, new Vector3(positionX, positionY, positionZ), Quaternion.identity);
+                    }
+                 
+                }
+                catch (Exception exception)
+                {
+                    throw new ApplicationException("Terrain Generator has failed with the folloing exception : \n : ", exception);
+                }
+            }
+            //----------------------------//
+        }
 
         GUILayout.EndVertical();
 
@@ -156,7 +204,7 @@ public class GenerationTool : EditorWindow
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
             GUILayout.BeginHorizontal();
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Octaves = " + octaves);
+            GUILayout.Label("Noise Map Layers = " + octaves);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             octaves = Mathf.RoundToInt(GUILayout.HorizontalSlider(octaves, octavesMin, octavesMax, GUILayout.Width(200)));
@@ -175,7 +223,7 @@ public class GenerationTool : EditorWindow
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
             GUILayout.BeginHorizontal();
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Depth = " + depth);
+            GUILayout.Label("Height of Terrain = " + depth);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             depth = Mathf.RoundToInt(GUILayout.HorizontalSlider(depth, depthMin, depthMax, GUILayout.Width(200)));
@@ -208,31 +256,13 @@ public class GenerationTool : EditorWindow
             GUILayout.EndVertical();
             //-------------------------------------------------------------------------------//
 
-            //Persistance Slider
-            //-------------------------------------------------------------------------------//
-            GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
-            GUILayout.BeginHorizontal();
-            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Persistance = " + persistance);
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            persistance = GUILayout.HorizontalSlider(persistance, persistanceMin, persistanceMax, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal(GUILayout.Width(200));
-            GUI.skin.label.alignment = TextAnchor.UpperLeft;
-            GUILayout.Label(persistanceMin.ToString());
-            GUI.skin.label.alignment = TextAnchor.UpperRight;
-            GUILayout.Label(persistanceMax.ToString());
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-            //-------------------------------------------------------------------------------//
 
             //Lacunarity Slider
             //-------------------------------------------------------------------------------//
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
             GUILayout.BeginHorizontal();
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Lacunarity = " + lacunarity);
+            GUILayout.Label("Bumpiness = " + lacunarity);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             lacunarity = GUILayout.HorizontalSlider(lacunarity, lacunarityMin, lacunarityMax, GUILayout.Width(200));
@@ -246,19 +276,26 @@ public class GenerationTool : EditorWindow
             GUILayout.EndVertical();
             //-------------------------------------------------------------------------------//
 
-            //Height Curve
+
+            //Persistance Slider
             //-------------------------------------------------------------------------------//
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(200));
             GUILayout.BeginHorizontal();
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Height Curve");
+            GUILayout.Label("Bumpiness occurence = " + persistance);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            heightCurve = EditorGUILayout.CurveField("Terrain Height Curve", heightCurve);
+            persistance = GUILayout.HorizontalSlider(persistance, persistanceMin, persistanceMax, GUILayout.Width(200));
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.Width(200));
+            GUI.skin.label.alignment = TextAnchor.UpperLeft;
+            GUILayout.Label(persistanceMin.ToString());
+            GUI.skin.label.alignment = TextAnchor.UpperRight;
+            GUILayout.Label(persistanceMax.ToString());
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             //-------------------------------------------------------------------------------//
-            GUILayout.EndVertical();
+
 
         }
         EditorGUILayout.EndToggleGroup();
@@ -293,5 +330,5 @@ public class GenerationTool : EditorWindow
         }
         EditorGUILayout.EndToggleGroup();
     }
-    }
+}
 
